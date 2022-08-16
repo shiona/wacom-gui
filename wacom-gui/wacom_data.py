@@ -12,14 +12,15 @@
 
 
 
-import subprocess
+from subprocess import check_output
 import os
 import xml.etree.ElementTree as ET
 import math
 import copy
 import sys
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 
 class Tablets:
@@ -35,8 +36,7 @@ class Tablets:
 
     def get_connected_tablets(self):
         # check if tablet is actually detected
-        p = subprocess.Popen("xsetwacom --list devices", shell=True, stdout=subprocess.PIPE)
-        dev_names = p.communicate()[0].split('\n')
+        dev_names = check_output("xsetwacom --list devices".split(" ")).decode("ascii").split('\n')
         # all devices must have a pad, use this as unique identifier
         detected = {}
         attr = {'type: TOUCH': 'touch',
@@ -64,12 +64,14 @@ class Tablets:
             pass
         self.__get_libwacom_data()
         self.tablets = {}
-        for device, inputs in detected.iteritems():
+        print(self.device_data)
+        for device, inputs in detected.items():
             if device[-4:] == '(WL)':
                 dev_type = device[:-5]
             else:
                 dev_type = device
             try:
+                print(f"trying {dev_type}")
                 # Cintiq Pro 24 hack
                 if dev_type == 'Wacom Cintiq Pro 24':
                     if 'Wacom Cintiq Pro 24 P' in self.device_data.keys():
@@ -110,16 +112,16 @@ class Tablets:
                             if id in device.keys():
                                 if 'id' not in device[id].keys():
                                     del device[id]
-            except:
+            except Exception as e:
+                print(e)
                 warning = QMessageBox(QMessageBox.Warning, "Unknown Device",
                                       "Device information for \"%s\" not found." % dev_type)
                 warning.exec_()
 
 
     def __get_libwacom_data(self):
-        p = subprocess.Popen("libwacom-list-local-devices --database %s" % self.db_path, shell=True,
-                             stdout=subprocess.PIPE)
-        output = p.communicate()[0].split('\n')
+        output = check_output(("libwacom-list-local-devices --format datafile --database %s" % self.db_path).split(" ")).decode("ascii").split('\n')
+        print(output)
         cur_device = None
         buttons = False
         for line in output:

@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtCore import * 
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 import sys
 import os
 from os.path import expanduser
@@ -196,7 +197,7 @@ class WacomGui(QMainWindow, wacom_menu.Ui_MainWindow):
             try:
                 os.remove(conf_path)
             except Exception as e:
-                print e
+                print(e)
             del self.configs[self.dev][self.config]
             self.getConfigs(0)
 
@@ -227,7 +228,7 @@ class WacomGui(QMainWindow, wacom_menu.Ui_MainWindow):
         if dev not in self.configs.keys():
             self.configs[dev] = {}
         if not os.path.exists(conf_path):
-            os.mkdir(self.tablet_data.tablets[dev][dev_id]['conf_path'])
+            os.makedirs(self.tablet_data.tablets[dev][dev_id]['conf_path'], exist_ok=True)
         if os.path.exists(conf_path):
             # get configs in path
             for config in os.listdir(conf_path):
@@ -503,17 +504,18 @@ class ButtonGroup(QObject):
 
     def addButton(self, label, wid=0, dev=0, dev_id=0, icon=None, isize=48, hide=False):
         select = False
-        idx = self.buttons.__len__() / 4
+        idx = self.buttons.__len__() // 4
         self.buttons[(idx, 0)] = QToolButton()
         self.btn_grp.addButton(self.buttons[(idx, 0)], idx)
         self.buttons[(idx, 1)] = dev
         self.buttons[(idx, 2)] = wid
         self.buttons[(idx, 3)] = dev_id
-        self.buttons[(idx, 0)].clicked[()].connect(self.buttonMapper.map)
+        # TODO: reimplement
+        #self.buttons[(idx, 0)].clicked[()].connect(self.buttonMapper.map)
         if label.split("Wacom ").__len__() == 2:
-            self.buttons[(idx, 0)].setText(QString(label[6:]))
+            self.buttons[(idx, 0)].setText(label[6:])
         else:
-            self.buttons[(idx, 0)].setText(QString(label))
+            self.buttons[(idx, 0)].setText(label)
         if icon is not None:
             self.buttons[(idx, 0)].setIcon(QIcon(icon))
             self.buttons[(idx, 0)].setIconSize(QSize(isize, isize))
