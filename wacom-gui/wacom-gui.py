@@ -512,6 +512,7 @@ class ButtonGroup(QObject):
         self.buttons[(idx, 3)] = dev_id
         # TODO: reimplement
         #self.buttons[(idx, 0)].clicked[()].connect(self.buttonMapper.map)
+        self.buttons[(idx, 0)].clicked.connect(self.buttonMapper.map)
         if label.split("Wacom ").__len__() == 2:
             self.buttons[(idx, 0)].setText(label[6:])
         else:

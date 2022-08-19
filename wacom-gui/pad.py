@@ -130,7 +130,7 @@ class Pad(QTabWidget, pad_ui.Ui_PadWidget):
         custom = {}
         p = subprocess.Popen("dconf dump /org/mate/desktop/keybindings/", shell=True, stdout=subprocess.PIPE)
         p.wait()
-        output = p.communicate()[0].split('\n')
+        output = p.communicate()[0].decode('utf-8').split('\n')
         for line in output:
             if '[custom' in line:
                 entry = line[1:-1]
@@ -160,8 +160,8 @@ class Pad(QTabWidget, pad_ui.Ui_PadWidget):
         but_loc = {}
         for bid in sorted(buttons.keys()):
             but_loc[bid] = buttons[bid]['pos']
-        #for bid, value in sorted(but_loc.items(), key=lambda (k, v): (v, k)):
-        for bid, value in but_loc.items():
+        for bid, value in sorted(but_loc.items(), key=lambda t: (t[1], t[0])):
+            #for bid, value in but_loc.items():
             if cmds.__len__() == 0:
                 keystroke = "Default"
             else:
@@ -203,12 +203,12 @@ class Pad(QTabWidget, pad_ui.Ui_PadWidget):
             scale_h = float(img_h / svg_size.height())
             if scale_h < scale_w:
                 vspace = round(img_w - (scale_h * svg_size.width()))
-                svg_vspace.changeSize(vspace, img_h, QSizePolicy.Fixed, QSizePolicy.Fixed)
-                svg_hspace.changeSize(img_w, 0, QSizePolicy.Fixed, QSizePolicy.Fixed)
+                svg_vspace.changeSize(vspace, int(img_h), QSizePolicy.Fixed, QSizePolicy.Fixed)
+                svg_hspace.changeSize(int(img_w), 0, QSizePolicy.Fixed, QSizePolicy.Fixed)
             else:
                 hspace = round(img_h - (scale_w * svg_size.height()))
-                svg_vspace.changeSize(0, img_h, QSizePolicy.Fixed, QSizePolicy.Fixed)
-                svg_hspace.changeSize(img_w, hspace, QSizePolicy.Fixed, QSizePolicy.Fixed)
+                svg_vspace.changeSize(0, int(img_h), QSizePolicy.Fixed, QSizePolicy.Fixed)
+                svg_hspace.changeSize(int(img_w), hspace, QSizePolicy.Fixed, QSizePolicy.Fixed)
         except Exception as e:
             print(e)
         # start to build...
