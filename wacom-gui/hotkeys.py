@@ -272,7 +272,7 @@ class KeystrokeGui(QDialog, keystroke.Ui_Dialog):
 
     def populate_fields(self, cmd):
         cmdline = ''
-        strokes = filter(None, re.split('{|}| ', cmd))
+        strokes = [i for i in re.split('{|}| ', cmd) if i]
         button = False
         for stroke in strokes:
             if 'button' in stroke:
@@ -397,7 +397,7 @@ class KeystrokeGui(QDialog, keystroke.Ui_Dialog):
         self.runinput.setText("")
 
     def remove_one(self):
-        strokes = filter(None, re.split('{|}', str(self.keystrokeinput.text())))
+        strokes = [i for i in re.split('{|}', str(self.keystrokeinput.text())) if i]
         strokes.pop()
         newcmd = ''
         for stroke in strokes:
@@ -405,7 +405,7 @@ class KeystrokeGui(QDialog, keystroke.Ui_Dialog):
         self.keystrokeinput.setText(newcmd)
 
     def delete_hotkey(self):
-        strokes = ' '.join(filter(None, re.split('{|}', str(self.keystrokeinput.text()))))
+        strokes = ' '.join(i for i in re.split('{|}', str(self.keystrokeinput.text())) if i)
         if strokes in self.keymap_custom.keys():
             if str(self.shortcutinput.text()) == self.keymap_custom[strokes]['label']:
                 if self.keymap_custom[strokes]['protected'] == 1:
@@ -436,7 +436,7 @@ class KeystrokeGui(QDialog, keystroke.Ui_Dialog):
         if 'button' in value:
             cmd = "{%s}" % value
         else:
-            strokes = filter(None, re.split('{|}| ', str(value)))
+            strokes = [i for i in re.split('{|}| ', str(value)) if i]
             for stroke in strokes:
                 cmd = "%s{%s}" % (cmd, stroke)
         self.keystrokeinput.setText("%s%s" % (blah, cmd))
@@ -473,7 +473,7 @@ class KeystrokeGui(QDialog, keystroke.Ui_Dialog):
                                         "Mouse/Scroll clicks are not valid for keyboard shortcuts.")
             warning.exec_()
             return False
-        strokes = filter(None, re.split('{|}| ', str(self.keystrokeinput.text())))
+        strokes = [i for i in re.split('{|}| ', str(self.keystrokeinput.text())) if i]
         # check input
         for idx, val in enumerate(strokes):
             if idx == 0 and val in self.keymap['Modifiers'].keys():
@@ -562,7 +562,7 @@ class KeystrokeGui(QDialog, keystroke.Ui_Dialog):
 
     def accept(self):
         # check if valid multi-key command
-        strokes = filter(None, re.split('{|}| ', str(self.keystrokeinput.text())))
+        strokes = [i for i in re.split('{|}| ', str(self.keystrokeinput.text())) if i]
         # invalid new shortcut
         if strokes.__len__() < 1:
             warning = QMessageBox(QMessageBox.Warning, "Keystroke length too short",
@@ -576,7 +576,7 @@ class KeystrokeGui(QDialog, keystroke.Ui_Dialog):
         # no shortcut name entered
         elif self.shortcutinput.text().__len__() <= 1:
             warning = QMessageBox(QMessageBox.Warning, "Shortcut Name Undefined",
-                                        "Please provide a shortcut name before saving.")
+                                        "Please provide a shortcut name before saving (min length 2 characters).")
             warning.exec_()
         # previously defined as shortcut
         elif ' '.join(strokes) in self.keys_custom_list.keys():
@@ -650,7 +650,7 @@ class KeystrokeGui(QDialog, keystroke.Ui_Dialog):
         result = dialog.exec_()
         if result == 1:
             cmd, label, run, dconf = dialog.get_cmd()
-            cmd = ' '.join(filter(None, re.split('{|}| ', str(cmd))))
+            cmd = ' '.join(i for i in re.split('{|}| ', str(cmd)) if i)
             return QDialog.Accepted, cmd, label, run, dconf
         else:
             return QDialog.Rejected, None, None, None, None
